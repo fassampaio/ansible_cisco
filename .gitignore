@@ -1,0 +1,5 @@
+# created by virtualenv automatically
+backup/
+bin/
+lib/
+pyvenv.cfg

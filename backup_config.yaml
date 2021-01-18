@@ -1,0 +1,24 @@
+---
+- name: Backup configuration of the devices
+  gather_facts: false
+
+  hosts: lab_devices
+
+  tasks:
+    - name: IOS >>> Get the running configuration and write to a file
+      ios_config:
+        backup: yes
+        backup_options:
+          dir_path: backup
+          filename: "{{ inventory_hostname }}.ios"
+      when: ansible_network_os == "ios"
+
+    - name: NXOS >>> Get the running configuration and write to a file
+      nxos_config:
+        backup: yes
+        backup_options:
+          dir_path: backup
+          filename: "{{ inventory_hostname }}.nxos"
+      when: ansible_network_os == "nxos"
+      
+...
