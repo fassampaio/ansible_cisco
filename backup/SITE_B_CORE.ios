@@ -1,9 +1,9 @@
 Building configuration...
 
   
-Current configuration : 3106 bytes
+Current configuration : 3428 bytes
 !
-! Last configuration change at 16:28:38 UTC Mon Jan 18 2021
+! Last configuration change at 17:41:41 UTC Mon Jan 18 2021
 !
 version 15.6
 service timestamps debug datetime msec
@@ -65,14 +65,20 @@ redundancy
 !
 !
 !
+interface Loopback0
+ ip address 192.168.200.1 255.255.255.255
+!
 interface GigabitEthernet0/0
- no ip address
+ ip address 172.16.2.1 255.255.255.0
+ no ip redirects
  duplex auto
  speed auto
  media-type rj45
 !
 interface GigabitEthernet0/1
- no ip address
+ description Local network
+ ip address 20.20.20.1 255.255.255.0
+ no ip redirects
  duplex auto
  speed auto
  media-type rj45
@@ -90,6 +96,12 @@ interface GigabitEthernet0/3
  duplex auto
  speed auto
  media-type rj45
+!
+router ospf 2
+ router-id 192.168.200.1
+ network 20.20.20.0 0.0.0.255 area 0
+ network 172.16.2.0 0.0.0.255 area 0
+ network 192.168.200.1 0.0.0.0 area 0
 !
 ip forward-protocol nd
 !

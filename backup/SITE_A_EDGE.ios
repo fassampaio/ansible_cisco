@@ -1,9 +1,9 @@
 Building configuration...
 
   
-Current configuration : 3106 bytes
+Current configuration : 3960 bytes
 !
-! Last configuration change at 16:27:11 UTC Mon Jan 18 2021
+! Last configuration change at 17:52:14 UTC Mon Jan 18 2021
 !
 version 15.6
 service timestamps debug datetime msec
@@ -65,14 +65,21 @@ redundancy
 !
 !
 !
+interface Loopback0
+ ip address 192.168.100.2 255.255.255.255
+!
 interface GigabitEthernet0/0
- no ip address
+ description SITE_A_CORE - g0/0
+ ip address 172.16.1.2 255.255.255.0
+ no ip redirects
  duplex auto
  speed auto
  media-type rj45
 !
 interface GigabitEthernet0/1
- no ip address
+ description SITE_B_EDGE - g0/1
+ ip address 192.168.0.1 255.255.255.252
+ no ip redirects
  duplex auto
  speed auto
  media-type rj45
@@ -91,12 +98,35 @@ interface GigabitEthernet0/3
  speed auto
  media-type rj45
 !
+router ospf 1
+ router-id 192.168.100.2
+ redistribute bgp 65100 subnets route-map BGP_TO_OSPF
+ network 172.16.1.0 0.0.0.255 area 0
+ network 192.168.100.2 0.0.0.0 area 0
+!
+router bgp 65100
+ bgp log-neighbor-changes
+ network 10.10.10.0 mask 255.255.255.0
+ neighbor 192.168.0.2 remote-as 65200
+ neighbor 192.168.0.2 soft-reconfiguration inbound
+ neighbor 192.168.0.2 route-map OSPF_TO_BGP out
+!
 ip forward-protocol nd
 !
 !
 no ip http server
 no ip http secure-server
 !
+!
+ip prefix-list OSPF_TO_BGP seq 5 permit 10.10.10.0/24
+!
+ip prefix-list SITE_B seq 5 permit 20.20.20.0/24
+!
+route-map OSPF_TO_BGP permit 10
+ match ip address prefix-list OSPF_TO_BGP
+!
+route-map BGP_TO_OSPF permit 10
+ match ip address prefix-list SITE_B
 !
 !
 !
