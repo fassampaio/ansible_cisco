@@ -1,0 +1,174 @@
+Building configuration...
+
+  
+Current configuration : 3960 bytes
+!
+! Last configuration change at 12:56:33 UTC Tue Jan 19 2021
+!
+version 15.6
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SITE_B_EDGE
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+ethernet lmi ce
+!
+!
+!
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no ip domain lookup
+ip domain name lab-01.com
+ip cef
+no ipv6 cef
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+username admin privilege 15 password 0 cisco
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 192.168.200.2 255.255.255.255
+!
+interface GigabitEthernet0/0
+ description SITE_B_CORE - g0/0
+ ip address 172.16.2.2 255.255.255.0
+ no ip redirects
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/1
+ description SITE_A_EDGE - g0/1
+ ip address 192.168.0.2 255.255.255.252
+ no ip redirects
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+ media-type rj45
+!
+interface GigabitEthernet0/3
+ description OOB
+ ip address 192.168.126.53 255.255.255.0
+ no ip redirects
+ duplex auto
+ speed auto
+ media-type rj45
+!
+router ospf 2
+ router-id 192.168.200.2
+ redistribute bgp 65200 subnets route-map BGP_TO_OSPF
+ network 172.16.2.0 0.0.0.255 area 0
+ network 192.168.200.2 0.0.0.0 area 0
+!
+router bgp 65200
+ bgp log-neighbor-changes
+ network 20.20.20.0 mask 255.255.255.0
+ neighbor 192.168.0.1 remote-as 65100
+ neighbor 192.168.0.1 soft-reconfiguration inbound
+ neighbor 192.168.0.1 route-map OSPF_TO_BGP out
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list OSPF_TO_BGP seq 5 permit 20.20.20.0/24
+!
+ip prefix-list SITE_A seq 5 permit 10.10.10.0/24
+!
+route-map OSPF_TO_BGP permit 10
+ match ip address prefix-list OSPF_TO_BGP
+!
+route-map BGP_TO_OSPF permit 10
+ match ip address prefix-list SITE_A
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************^C
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+line aux 0
+line vty 0 4
+ logging synchronous
+ login local
+ transport input ssh
+!
+no scheduler allocate
+!
+end

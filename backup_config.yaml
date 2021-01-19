@@ -3,14 +3,14 @@
   gather_facts: false
 
   hosts: lab_devices
-
+ 
   tasks:
     - name: IOS >>> Get the running configuration and write to a file
       ios_config:
         backup: yes
         backup_options:
           dir_path: backup
-          filename: "{{ inventory_hostname }}.ios"
+          filename: "{{ inventory_hostname }}_backup_config.ios"
       when: ansible_network_os == "ios"
 
     - name: NXOS >>> Get the running configuration and write to a file
